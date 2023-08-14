@@ -6,16 +6,16 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 
 # Generated Q martix randomly
-Q = np.zeros((36,1))
+Q = np.zeros((12,1))
 segment_sum = 2
-for i in range(3):
+for i in range(1):
     valid = False
     while not valid:
         temp = np.abs(np.random.rand(12,1))
         temp = temp * segment_sum / np.sum(temp)
         if np.abs(np.sum(temp * 2 / np.sum(temp)) - np.sum(temp)) < 1e-6:
             valid = True
-    Q[i*12:(i+1)*12] = temp
+Q[i*12:(i+1)*12] = temp
 
 #define input
 dataset = Q
@@ -39,11 +39,11 @@ class RNN(nn.Module):
         #output2 = (output > 0.5).float()  # binary output
         return output.unsqueeze(-1)
 
-sequence_length = 36
+sequence_length = 684
 input_size = 1
 hidden_size = 256
 num_layers = 1
-output_size = 36
+output_size = 684
 num_epochs = 100
 learning_rate = 0.01
 

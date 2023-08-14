@@ -6,16 +6,16 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 
 # Generated Q martix randomly
-Q = np.zeros((36,1))
+Q = np.zeros((12,1))
 segment_sum = 2
-for i in range(3):
+for i in range(1):
     valid = False
     while not valid:
         temp = np.abs(np.random.rand(12,1))
         temp = temp * segment_sum / np.sum(temp)
         if np.abs(np.sum(temp * 2 / np.sum(temp)) - np.sum(temp)) < 1e-6:
             valid = True
-    Q[i*12:(i+1)*12] = temp
+Q[i*12:(i+1)*12] = temp
 
 #define input
 dataset = Q
@@ -35,15 +35,16 @@ class RNN(nn.Module):
         q0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         output, _ = self.rnn(x, q0)
         output = self.fc(output[:, -1, :])
-        output = torch.sigmoid(output)
-        #output2 = (output > 0.5).float()  # binary output
+        #output = torch.sigmoid(output)
+        output = torch.nn.functional.gumbel_softmax(output, hard=False) #Gumbel-Softmax
         return output.unsqueeze(-1)
 
-sequence_length = 36
+
+sequence_length = 12
 input_size = 1
 hidden_size = 256
 num_layers = 1
-output_size = 36
+output_size = 12
 num_epochs = 100
 learning_rate = 0.01
 
@@ -65,6 +66,7 @@ for epoch in range(num_epochs):
     model.train()
     Sn = model(input_tensor)
     #Sn_binary = (Sn > 0.5).float()
+    print(f"Epoch: {epoch+1}/{num_epochs}, Model output: {Sn}")
     qn_new = (qn.detach() * epoch + Sn) / (epoch + 1)
     loss = criterion(qn_new, input_tensor)
 
@@ -84,6 +86,5 @@ plt.title('Loss Function')
 plt.show()
 
 # Save the final qn to CSV
-
 qn_np = qn.squeeze(0).numpy()
 pd.DataFrame(qn_np).to_csv('output.csv', index=False,header=False)

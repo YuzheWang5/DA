@@ -39,7 +39,7 @@ class RNN(nn.Module):
         #output2 = (output > 0.5).float()  # binary output
         return output.unsqueeze(-1)
 
-sequence_length = 36
+sequence_length = 35
 input_size = 1
 hidden_size = 256
 num_layers = 1

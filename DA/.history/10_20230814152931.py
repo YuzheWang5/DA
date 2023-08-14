@@ -39,7 +39,7 @@ class RNN(nn.Module):
         #output2 = (output > 0.5).float()  # binary output
         return output.unsqueeze(-1)
 
-sequence_length = 36
+sequence_length = 35
 input_size = 1
 hidden_size = 256
 num_layers = 1
@@ -65,7 +65,7 @@ for epoch in range(num_epochs):
     model.train()
     Sn = model(input_tensor)
     #Sn_binary = (Sn > 0.5).float()
-    qn_new = (qn.detach() * epoch + Sn) / (epoch + 1)
+    qn_new = (qn.detach() * epoch + Sn) / (epoch)
     loss = criterion(qn_new, input_tensor)
 
     optimizer.zero_grad()
